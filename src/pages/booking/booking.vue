@@ -1,7 +1,7 @@
 <template>
-  <view class="booking">
-    <text>约课页面</text>
-  </view>
+    <view class="booking">
+        <text>约课页面</text>
+    </view>
 </template>
 
 <script setup>
@@ -10,6 +10,6 @@
 
 <style lang="scss" scoped>
 .booking {
-  padding: 20rpx;
+    padding: 20rpx;
 }
 </style>
