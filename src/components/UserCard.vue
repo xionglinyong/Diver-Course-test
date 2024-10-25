@@ -1,18 +1,24 @@
 <template>
     <view class="user-card">
         <image :src="imageUrl" mode="aspectFill"></image>
-        <view v-if="showEditIcon" class="edit-icon" @click="showCertificateStyles">
+        <view v-if="showEditIcon" class="edit-icon" @click="showMyCertificates">
             <image src="/static/edit-icon.png" mode="aspectFit"></image>
         </view>
     </view>
     <DrawerDialog :show="showStylesDialog" title="选择展示卡面" height="75%" @close="showStylesDialog = false">
         <scroll-view scroll-y class="styles-scroll-view">
-            <view class="styles-grid">
-                <view v-for="style in certificateStyles" :key="style.id" class="style-item" @click="selectStyle(style)">
+            <view v-if="certificateList.length > 0" class="styles-grid">
+                <view v-for="style in certificateList" :key="style.id" class="style-item" @click="selectStyle(style)">
                     <image :src="style.imageUrl" mode="aspectFill"></image>
                     <text>{{ style.name }}</text>
                 </view>
             </view>
+            <Empty
+                v-else
+                text="暂无可用的证书"
+                buttonText="刷新"
+                @buttonClick="showMyCertificates"
+            />
         </scroll-view>
     </DrawerDialog>
 </template>
@@ -20,6 +26,7 @@
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue'
 import DrawerDialog from './DrawerDialog.vue'
+import Empty from './Empty.vue'
 import { request } from '@/utils/request'
 
 const props = defineProps({
@@ -36,25 +43,16 @@ const props = defineProps({
 const emit = defineEmits(['update:imageUrl'])
 
 const showStylesDialog = ref(false)
-const certificateStyles = ref([
-    { id: 1, name: '初级瑜伽证书', imageUrl: '/static/certificate-style1.jpg' },
-    { id: 2, name: '中级瑜伽证书', imageUrl: '/static/certificate-style2.jpg' },
-    { id: 3, name: '高级瑜伽证书', imageUrl: '/static/certificate-style3.jpg' },
-    { id: 4, name: '瑜伽教练证书', imageUrl: '/static/certificate-style4.jpg' },
-    { id: 5, name: '瑜伽冥想证书', imageUrl: '/static/certificate-style5.jpg' },
-])
+const certificateList = ref([])
 
-const showCertificateStyles = async () => {
-    // 注释掉原来的 API 请求，直接使用模拟数据
-    // try {
-    //     const response = await request({ url: '/api/user/certificates' })
-    //     certificateStyles.value = response.data
-    //     showStylesDialog.value = true
-    // } catch (error) {
-    //     console.error('获取证书样式失败:', error)
-    // }
-
-    // 直接显示对话框，使用模拟数据
+const showMyCertificates = async () => {
+    try {
+        const response = await request({ url: '/api/user/certificates' })
+        certificateList.value = response.data
+    } catch (error) {
+        console.error('获取证书样式失败:', error)
+        certificateList.value = [] // 确保在失败时清空列表
+    }
     showStylesDialog.value = true
 }
 
@@ -85,13 +83,13 @@ const selectStyle = (newStyle) => {
     position: absolute;
     right: 20rpx;
     bottom: 20rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 60rpx;
     height: 60rpx;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     cursor: pointer;
 
     image {
@@ -119,11 +117,10 @@ const selectStyle = (newStyle) => {
 
     image {
         width: 100%;
-        height: unset;
         aspect-ratio: 1.685 / 1;
-        object-fit: cover;
-        border-radius: 16rpx;
         margin-bottom: 10rpx;
+        border-radius: 16rpx;
+        object-fit: cover;
     }
 
     text {

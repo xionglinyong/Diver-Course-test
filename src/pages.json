@@ -9,7 +9,7 @@
 		{
 			"path": "pages/booking/booking",
 			"style": {
-				"navigationBarTitleText": "约课"
+				"navigationBarTitleText": "课程预约"
 			}
 		},
 		{
@@ -47,7 +47,7 @@
 				"pagePath": "pages/booking/booking",
 				"iconPath": "static/tabbar/booking.png",
 				"selectedIconPath": "static/tabbar/booking-active.png",
-				"text": "约课"
+				"text": "课程预约"
 			},
 			{
 				"pagePath": "pages/my/my",

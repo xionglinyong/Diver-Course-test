@@ -6,10 +6,16 @@
                 {{ tab }}
             </view>
         </view>
-        <view class="certificate-list">
+        <view v-if="filteredCertificates.length > 0" class="certificate-list">
             <UserCard v-for="certificate in filteredCertificates" :key="certificate.id" :imageUrl="certificate.imageUrl"
                 :title="certificate.title" :date="certificate.date" class="certificate-item" />
         </view>
+        <Empty
+            v-else
+            text="暂无证书"
+            buttonText="刷新"
+            @buttonClick="fetchCertificates"
+        />
     </view>
 </template>
 
@@ -18,6 +24,7 @@ import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import UserCard from '@/components/UserCard.vue'
 import { request } from '@/utils/request'
+import Empty from '@/components/Empty.vue'
 
 const tabs = ['所有证书', '类型1', '类型2']
 const currentTab = ref(0)
@@ -62,9 +69,9 @@ onLoad(() => {
 
 .tab-item {
     padding: 10rpx 20rpx;
+    border-bottom: 4rpx solid transparent;
     font-size: 28rpx;
     color: #333;
-    border-bottom: 4rpx solid transparent;
 
     &.active {
         color: #007AFF;
