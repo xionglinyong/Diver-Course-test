@@ -44,7 +44,7 @@ defineEmits(['close'])
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--mask-bg-color);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -59,8 +59,8 @@ defineEmits(['close'])
     display: flex;
     flex-direction: column;
     width: 100%;
-    background-color: #ffffff;
-    border-radius: 16rpx 16rpx 0 0;
+    background-color: var(--primary-bg-color);
+    border-radius: var(--size-16) var(--size-16) 0 0;
     transform: translateY(100%);
     transition: transform 0.3s ease;
 

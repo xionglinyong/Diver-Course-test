@@ -13,12 +13,7 @@
                     <text>{{ style.name }}</text>
                 </view>
             </view>
-            <Empty
-                v-else
-                text="暂无可用的证书"
-                buttonText="刷新"
-                @buttonClick="showMyCertificates"
-            />
+            <Empty v-else text="暂无可用的证书" buttonText="刷新" @buttonClick="showMyCertificates" />
         </scroll-view>
     </DrawerDialog>
 </template>
@@ -68,7 +63,7 @@ const selectStyle = (newStyle) => {
     width: 100%;
     aspect-ratio: 1.685 / 1;
     background-color: #ffffff;
-    border-radius: 32rpx;
+    border-radius: var(--size-32);
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
@@ -89,7 +84,7 @@ const selectStyle = (newStyle) => {
     width: 60rpx;
     height: 60rpx;
     background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
+    border-radius: var(--border-radius-round);
     cursor: pointer;
 
     image {
@@ -119,7 +114,7 @@ const selectStyle = (newStyle) => {
         width: 100%;
         aspect-ratio: 1.685 / 1;
         margin-bottom: 10rpx;
-        border-radius: 16rpx;
+        border-radius: var(--size-16);
         object-fit: cover;
     }
 

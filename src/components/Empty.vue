@@ -1,16 +1,8 @@
 <template>
   <view class="empty-container">
-    <image
-      class="empty-image"
-      :src="image"
-      mode="aspectFit"
-    ></image>
+    <image class="empty-image" :src="image" mode="aspectFit"></image>
     <text class="empty-text">{{ text }}</text>
-    <view
-      v-if="buttonText"
-      class="empty-button"
-      @click="$emit('buttonClick')"
-    >
+    <view v-if="buttonText" class="empty-button" @click="$emit('buttonClick')">
       {{ buttonText }}
     </view>
   </view>
@@ -56,7 +48,7 @@ defineEmits(['buttonClick'])
 
 .empty-text {
   margin-bottom: 20rpx;
-  font-size: 28rpx;
+  font-size: var(--size-28);
   color: #999;
   text-align: center;
 }
@@ -64,8 +56,8 @@ defineEmits(['buttonClick'])
 .empty-button {
   padding: 10rpx 20rpx;
   background-color: #007AFF;
-  border-radius: 8rpx;
-  font-size: 28rpx;
+  border-radius: var(--size-8);
+  font-size: var(--size-28);
   color: #fff;
 }
 </style>

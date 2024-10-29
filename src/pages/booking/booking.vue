@@ -1,47 +1,29 @@
 <template>
-    <view class="booking" :style="{ height: bookingHeight }">
+    <view class="booking box-border" :style="{ height: bookingHeight }">
         <view class="calendar-box">
-            <view class="calendar">
-                <view class="weekdays">
-                    <text v-for="day in weekdays" :key="day">{{ day }}</text>
-                </view>
-                <view class="calendar-body" :class="{ 'expanded': isExpanded }">
-                    <view v-for="(week, weekIndex) in displayedWeeks" :key="weekIndex" class="week">
-                        <view v-for="day in week" :key="day.date" class="day"
-                            :class="{ 'today': isToday(day.date), 'selected': isSelected(day.date) }"
-                            @click="selectDay(day)">
-                            <text>{{ day.date.getDate() }}</text>
-                        </view>
+            <scroll-view scroll-x show-scrollbar="false" class="weekday-list">
+                <view class="weekdays flex">
+                    <view v-for="(day, index) in weekDays" :key="index" class="days box-border"
+                        :class="{ 'active': isSelected(day.date), 'today': isToday(day.date) }" @click="selectDay(day)">
+                        <view class="day">{{ formatDay(day.date) }}</view>
+                        <view class="week">{{ day.weekDay }}</view>
                     </view>
                 </view>
-            </view>
-
-            <view class="calendar-expand" @click="toggleCalendarExpand">
-                {{ isExpanded ? '收起' : '展开' }}
-            </view>
+            </scroll-view>
         </view>
 
-        <view class="daily-schedule">
+        <view class="daily-schedule flex flex-col box-border">
             <view class="schedule-header">
                 <view class="schedule-filter">全部课程</view>
                 <view class="schedule-filter">全部教练</view>
                 <view class="schedule-filter">全部时段</view>
             </view>
 
-            <scroll-view scroll-y class="class-list" stlye="" v-if="filteredClasses.length > 0">
-                <view v-for="(classItem, index) in filteredClasses" :key="index" class="class-item">
-                    <view class="class-info">
-                        <image class="coach-avatar" :src="classItem.coachAvatar" mode="aspectFill"></image>
-                        <text class="coach-name">{{ classItem.coach }}</text>
-                        <view class="class-details">
-                            <text class="class-name">{{ classItem.name }}</text>
-                            <text class="class-time">{{ classItem.time }}</text>
-                        </view>
-                    </view>
-                    <view class="book-btn" @click="bookClass(classItem)">预 约</view>
-                </view>
+            <scroll-view scroll-y class="class-list box-border" v-if="filteredClasses.length > 0" show-scrollbar="false">
+                <ClassItem class="mt-20" v-for="(classItem, index) in filteredClasses" :key="index" :class-info="classItem"
+                    @book="bookClass(classItem)" />
             </scroll-view>
-            <Empty v-else text="当前筛选条件下暂无课程" buttonText="刷新" @buttonClick="refreshClasses" />
+            <Empty v-else text="当前筛选条件下暂无课程" />
         </view>
     </view>
 </template>
@@ -50,6 +32,7 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import Empty from '@/components/Empty.vue'
+import ClassItem from './components/ClassItem.vue'
 
 const bookingHeight = ref('auto')
 onLoad(() => {
@@ -57,40 +40,31 @@ onLoad(() => {
     bookingHeight.value = `${sys.windowHeight}px`
 })
 
-const isExpanded = ref(false)
 const selectedDate = ref(new Date())
-const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+const weekDayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
-const generateWeeks = (startDate, numWeeks) => {
-    const weeks = []
-    const start = new Date(startDate)
-    start.setDate(start.getDate() - start.getDay() + 1) // 调整到本周一
-    for (let i = 0; i < numWeeks; i++) {
-        const week = []
-        for (let j = 0; j < 7; j++) {
-            const date = new Date(start)
-            date.setDate(date.getDate() + i * 7 + j)
-            week.push({
-                date,
-                hasClass: Math.random() > 0.5 // 模拟是否有课程
-            })
-        }
-        weeks.push(week)
-    }
-    return weeks
-}
-
-const displayedWeeks = computed(() => {
+// 生成未来7天的日期数据
+const weekDays = computed(() => {
+    const days = []
     const today = new Date()
-    const startOfWeek = new Date(today)
-    startOfWeek.setDate(today.getDate() - today.getDay() + 1) // 调整到本周一
-    return generateWeeks(startOfWeek, isExpanded.value ? 3 : 1)
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date()
+        date.setDate(today.getDate() + i)
+        days.push({
+            date: date,
+            weekDay: weekDayNames[date.getDay()]
+        })
+    }
+    return days
 })
 
-const toggleCalendarExpand = () => {
-    isExpanded.value = !isExpanded.value
+// 格式化日期显示
+const formatDay = (date) => {
+    return date.getDate()
 }
 
+// 判断是否是今天
 const isToday = (date) => {
     const today = new Date()
     return date.getDate() === today.getDate() &&
@@ -98,12 +72,14 @@ const isToday = (date) => {
         date.getFullYear() === today.getFullYear()
 }
 
+// 判断是否被选中
 const isSelected = (date) => {
     return date.getDate() === selectedDate.value.getDate() &&
         date.getMonth() === selectedDate.value.getMonth() &&
         date.getFullYear() === selectedDate.value.getFullYear()
 }
 
+// 选择日期
 const selectDay = (day) => {
     selectedDate.value = day.date
 }
@@ -170,26 +146,6 @@ const todayClasses = ref([
         name: '冥想课程',
         coach: '赵教练',
         coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
     },
 ])
 
@@ -205,113 +161,91 @@ const bookClass = (classItem) => {
     console.log('预约课程:', classItem)
     // 这里添加预约逻辑
 }
-
-const refreshClasses = () => {
-    // 这里添加刷新课程列表的逻辑
-    console.log('刷新课程列表')
-    // 例如：重新获取课程数据
-    // fetchClasses()
-}
 </script>
 
 <style lang="scss" scoped>
 .booking {
     display: flex;
     flex-direction: column;
-    gap: 20rpx;
+    gap: var(--size-20);
+    color: var(--text-color);
+    background-color: var(--primary-bg-color);
 }
 
 .calendar-box {
     display: flex;
     flex-direction: column;
-    gap: 20rpx;
-    padding: 20rpx;
-}
+    gap: var(--size-20);
 
-.calendar {
-    overflow: hidden;
-    background-color: #fff;
-    border-radius: 10rpx;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
-
-    .weekdays {
-        display: flex;
-        justify-content: space-around;
-        gap: 12rpx;
-        padding: 10rpx 0;
-        background-color: #f0f0f0;
-
-        text {
-            width: 10%;
-            text-align: center;
-            font-size: 24rpx;
-            color: #666;
-        }
-    }
-}
-
-.calendar-body {
-    height: 72rpx;
-    padding: 12rpx 0;
-    transition: height 0.3s ease;
-
-    &.expanded {
-        height: 214rpx;
-    }
-
-    .week {
-        display: flex;
-        justify-content: space-around;
-        gap: 12rpx;
-    }
-
-    .day {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 10%;
-        height: unset;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        font-size: 28rpx;
-        color: #333;
-
-        &.today {
-            background-color: #e6f7ff;
-            font-weight: bold;
+    .weekday-list {
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+            color: transparent;
         }
 
-        &.selected {
-            background-color: #1890ff;
-            color: #fff;
+        .weekdays {
+            width: min-content;
+            padding: var(--size-20);
+            gap: var(--size-20);
+
+            .days {
+                flex: none;
+                width: 12.5vw;
+                padding: var(--size-20) 10rpx;
+                background: var(--auxiliary-color-5);
+                border-radius: var(--size-16);
+                text-align: center;
+                transition: all 0.3s ease;
+
+                .day {
+                    margin-bottom: 12rpx;
+                    font-size: var(--size-32);
+                    font-weight: bold;
+                    color: var(--auxiliary-color-1);
+                }
+
+                .week {
+                    font-size: var(--size-24);
+                    color: var(--auxiliary-color-4);
+                }
+
+                &.today,
+                &.active {
+                    background: var(--gradient-bg-color);
+
+                    .day {
+                        color: var(--text-color-inverse);
+                    }
+
+                    .week {
+                        color: var(--auxiliary-color-5);
+                    }
+                }
+
+                &.today {
+                    opacity: 0.5;
+                }
+
+                &.today.active {
+                    opacity: 1;
+                }
+            }
         }
     }
-}
-
-.calendar-expand {
-    padding: 10rpx;
-    border-radius: 10rpx;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
-    font-size: 24rpx;
-    color: #666;
-    text-align: center;
 }
 
 .daily-schedule {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    padding: 20rpx 0;
+    flex: 1;
 
     .schedule-header {
         display: flex;
         justify-content: space-between;
-        padding: 24rpx;
-        font-size: 32rpx;
+        padding: var(--size-24) var(--size-32);
+        border-top: 1rpx solid var(--auxiliary-color-4);
+        font-size: var(--font-size-32);
         font-weight: bold;
-        color: #333;
-        border-bottom: 1rpx solid;
     }
 
     .schedule-filter {}
@@ -319,77 +253,16 @@ const refreshClasses = () => {
 
 .class-list {
     flex: 1 1 auto;
-    height: 584rpx; // 设置一个固定高度以启用滚动
-    padding: 0 20rpx;
+    height: 584rpx;
+    padding: 0 20rpx 20rpx;
+    background-color: var(--primary-bg-color);
     overflow-y: auto;
-    box-sizing: border-box;
 
-    .class-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20rpx;
-        margin-top: 20rpx;
-        border-radius: 10rpx;
-        background-color: rgba(0, 0, 0, 0.1);
+    ::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+        color: transparent;
     }
-}
-
-.class-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .coach-avatar {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 50%;
-        margin-right: 20rpx;
-    }
-
-    .coach-name {
-        font-size: 32rpx;
-        font-weight: bold;
-        margin-top: 4rpx;
-    }
-
-    .class-details {
-        display: flex;
-        flex-direction: column;
-
-        .class-name {
-            font-size: 28rpx;
-            font-weight: bold;
-        }
-
-        .class-time {
-            font-size: 24rpx;
-            color: #999;
-            margin-top: 4rpx;
-        }
-    }
-}
-
-.book-btn {
-    padding: 16rpx 28rpx;
-    background-color: #007AFF;
-    color: #fff;
-    border-radius: 40rpx;
-    font-size: 24rpx;
-}
-
-.schedule-nav-bar {
-    display: flex;
-    justify-content: space-around;
-    padding: 20rpx 0;
-    background-color: #f8f8f8;
-    border-bottom: 1rpx solid #e0e0e0;
-}
-
-// 移除之前的 .picker 样式
-
-// 可能需要添加一些样式来调整 uni-data-select 的外观
-:deep(.uni-data-select) {
-    width: 30%;
 }
 </style>

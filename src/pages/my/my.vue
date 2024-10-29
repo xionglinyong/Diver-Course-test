@@ -4,11 +4,8 @@
         <view class="top-background">
             <!-- 证书卡片 -->
             <view class="user-card-box">
-                <UserCard
-                    :imageUrl="certificateImageUrl"
-                    :showEditIcon="true"
-                    @update:imageUrl="updateCertificateImage"
-                ></UserCard>
+                <UserCard :imageUrl="certificateImageUrl" :showEditIcon="true" @update:imageUrl="updateCertificateImage">
+                </UserCard>
             </view>
         </view>
 
@@ -148,14 +145,14 @@ onMounted(async () => {
     padding: 20rpx;
     gap: 20rpx;
     background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 16rpx;
+    border-radius: var(--size-16);
     box-sizing: border-box;
 }
 
 .avatar {
     width: 120rpx;
     height: 120rpx;
-    border-radius: 50%;
+    border-radius: var(--border-radius-round);
 }
 
 .user-details {
@@ -194,7 +191,7 @@ onMounted(async () => {
     padding: 20rpx;
     margin-bottom: 20rpx;
     background-color: #ffffff;
-    border-radius: 16rpx;
+    border-radius: var(--size-16);
 }
 
 .entry-item {
@@ -213,7 +210,7 @@ onMounted(async () => {
 .mall-orders {
     padding: 20rpx;
     background-color: #ffffff;
-    border-radius: 16rpx;
+    border-radius: var(--size-16);
 }
 
 .section-header {
