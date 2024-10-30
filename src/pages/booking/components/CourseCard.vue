@@ -1,23 +1,23 @@
 <template>
-    <view class="class-card flex box-border">
-        <view class="class-image-box flex-none">
-            <image class="class-image" src="/static/class-bg.png" mode="aspectFill"></image>
-            <view class="class-time">{{ classInfo.time }}</view>
+    <view class="course-card flex box-border">
+        <view class="course-image-box flex-none">
+            <image class="course-image" src="/static/course-bg.png" mode="aspectFill"></image>
+            <view class="course-time">{{ data.time }}</view>
         </view>
 
-        <view class="class-info flex flex-col flex-auto">
-            <view class="class-details flex flex-col">
-                <text class="class-name" @click="">
-                    {{ classInfo.name }} · {{ classInfo.coach.name }}
+        <view class="course-info flex flex-col flex-auto">
+            <view class="course-details flex flex-col">
+                <text class="course-name fs-16" @click="handleJumpDetail">
+                    {{ data.name }} · {{ data.coach.name }}
                 </text>
-                <view class="class-labels flex">
-                    <text class="class-label box-border" v-for="item in labels" :key="item">
+                <view class="course-labels flex">
+                    <text class="course-label fs-12 box-border" v-for="item in labels" :key="item">
                         {{ item }}
                     </text>
                 </view>
             </view>
-            <view class="class-foot flex">
-                <view class="class-join flex">
+            <view class="course-foot flex">
+                <view class="course-join flex fs-10">
                     <view class="user-avatars" v-if="userAvatats.length">
                         <image v-for="(item, i) in userAvatats" :key="i" :src="item.avatarUrl" mode="aspectFill">
                         </image>
@@ -34,7 +34,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    classInfo: {
+    data: {
         type: Object,
         default: () => ({}),
         required: true
@@ -43,13 +43,23 @@ const props = defineProps({
 
 const emit = defineEmits(['prebook'])
 
-const labels = computed(() => (props.classInfo.labels || []).slice(0, 3))
+const labels = computed(() => (props.data.labels || []).slice(0, 3))
 
 const joinCount = computed(() => {
-    return (props.classInfo.joinUsers || []).length
+    return (props.data.joinUsers || []).length
 })
 
-const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3))
+const userAvatats = computed(() => (props.data.joinUsers || []).slice(0, 3))
+
+const handleJumpDetail = () => {
+    const url = '/pages/course-detail/course-detail'
+    uni.navigateTo({
+        url: `${url}?id=${props.data.id}`,
+        success: (res) => {
+            // res.eventChannel.emit('')
+        }
+    })
+}
 
 const handlePreBook = () => {
     emit('prebook')
@@ -57,7 +67,7 @@ const handlePreBook = () => {
 </script>
 
 <style lang="scss" scoped>
-.class-card {
+.course-card {
     justify-content: space-between;
     align-items: center;
     gap: var(--size-20);
@@ -68,19 +78,19 @@ const handlePreBook = () => {
 }
 
 
-.class-image-box {
+.course-image-box {
     position: relative;
     border-radius: var(--size-8);
     overflow: hidden;
 
-    .class-image {
+    .course-image {
         display: block;
         width: 30vw;
         height: auto;
         aspect-ratio: 1.25;
     }
 
-    .class-time {
+    .course-time {
         position: absolute;
         width: 100%;
         bottom: 0;
@@ -91,38 +101,35 @@ const handlePreBook = () => {
     }
 }
 
-.class-info {
+.course-info {
     justify-content: space-between;
     min-height: inherit;
 
-    .class-details {
+    .course-details {
         gap: var(--size-12);
 
-        .class-name {
-            font-size: var(--size-32);
+        .course-name {
             font-weight: bold;
         }
 
-        .class-labels {
+        .course-labels {
             gap: var(--size-10)
         }
 
-        .class-label {
+        .course-label {
             padding: 6rpx 10rpx;
             text-align: center;
-            font-size: var(--size-24);
             background-color: var(--auxiliary-opacity-color-3);
             border-radius: var(--size-8);
         }
     }
 
-    .class-foot {
+    .course-foot {
         justify-content: space-between;
 
-        .class-join {
+        .course-join {
             align-items: center;
             gap: var(--size-12);
-            font-size: var(--size-20);
             color: var(--auxiliary-color-4);
 
             .user-avatars {

@@ -41,6 +41,9 @@ page {
     --primary-color: #23ee7d;
     --primary-opacity-color: rgba(35, 238, 126, 0.1);
     --primary-bg-color: #2e2f34;
+    --primary-opacity-bg-color-1: rgba(46, 47, 52, 0.5);
+    --primary-opacity-bg-color-2: rgba(46, 47, 52, 0.75);
+    --primary-opacity-bg-color-3: rgba(46, 47, 52, 0.9);
     --auxiliary-color-1: #eef7f2; // 月白
     --auxiliary-color-2: #cdd1d3; // 银鱼白
     --auxiliary-color-3: #a8aab3;
@@ -129,6 +132,30 @@ page {
     flex: none;
 }
 
+.fs-10 {
+    font-size: var(--size-20);
+}
+
+.fs-12 {
+    font-size: var(--size-24);
+}
+
+.fs-14 {
+    font-size: var(--size-28);
+}
+
+.fs-16 {
+    font-size: var(--size-32);
+}
+
+.fs-18 {
+    font-size: var(36rpx);
+}
+
+.mt-20 {
+    margin-top: 20rpx;
+}
+
 .box-border {
     box-sizing: border-box;
 }
@@ -138,9 +165,7 @@ page {
     background: var(--gradient-bg-color);
 }
 
-.mt-20 {
-    margin-top: 20rpx;
-}
+
 
 /* 为自定义导航栏预留底部空间 */
 page {

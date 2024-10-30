@@ -23,6 +23,18 @@
 			"style": {
 				"navigationBarTitleText": "我的证书"
 			}
+		},
+		{
+			"path": "pages/course-detail/course-detail",
+			"style": {
+				"navigationBarTitleText": "课程详情"
+			}
+		},
+		{
+			"path": "pages/coach-detail/coach-detail",
+			"style": {
+				"navigationBarTitleText": "教练详情"
+			}
 		}
 	],
 	"tabBar": {

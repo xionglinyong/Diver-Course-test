@@ -27,7 +27,6 @@ export const getPageHeight = () => {
   return sys.windowHeight - tabBarHeight;
 };
 
-
 /**
  * 更新 tab 的选中状态
  */
@@ -40,4 +39,16 @@ export const updateTabActive = () => {
   if (typeof page.getTabBar === "function") {
     page.getTabBar().setData({ selected: index });
   }
+};
+
+/**
+ * 获取当前页的页面实例的事件通道
+ * @returns
+ */
+export const getEventChannel = () => {
+  const pages = getCurrentPages();
+  const page = pages[pages.length - 1];
+  const eventChannel = page.getOpenerEventChannel();
+
+  return eventChannel;
 };

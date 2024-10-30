@@ -5,8 +5,8 @@
                 <view class="weekdays flex">
                     <view v-for="(day, index) in weekDays" :key="index" class="days box-border"
                         :class="{ 'active': isSelected(day.date), 'today': isToday(day.date) }" @click="selectDay(day)">
-                        <view class="day">{{ formatDay(day.date) }}</view>
-                        <view class="week">{{ day.weekDay }}</view>
+                        <view class="day fs-16">{{ formatDay(day.date) }}</view>
+                        <view class="week fs-12">{{ day.weekDay }}</view>
                     </view>
                 </view>
             </scroll-view>
@@ -20,12 +20,12 @@
             </view>
 
             <scroll-view scroll-y class="class-list box-border" v-if="filteredData.length > 0" show-scrollbar="false">
-                <ClassCard class="mt-20" v-for="(dataItem, index) in filteredData"
-                    v-if="scheduleType === scheduleTypeEnum.classes" :key="index" :class-info="dataItem"
+                <CourseCard class="mt-20" v-for="(dataItem, index) in filteredData"
+                    v-if="scheduleType === scheduleTypeEnum.classes" :key="index" :data="dataItem"
                     @prebook="handlePreBook(dataItem)" />
 
                 <CoachCard class="mt-20" v-for="(dataItem, index) in filteredData"
-                    v-if="scheduleType === scheduleTypeEnum.coaches" :key="index" :coach-info="dataItem"
+                    v-if="scheduleType === scheduleTypeEnum.coaches" :key="index" :data="dataItem"
                     @prebook="handlePreBook(dataItem)" />
             </scroll-view>
             <Empty v-else text="今日暂无课程安排" />
@@ -38,7 +38,7 @@ import { ref, computed, watch } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import Empty from '@/components/Empty.vue'
 import CoachCard from './components/CoachCard.vue'
-import ClassCard from './components/ClassCard.vue'
+import CourseCard from './components/CourseCard.vue'
 import { getPageHeight, updateTabActive } from "@/utils/common"
 import mock from "./mock.js";
 
@@ -97,8 +97,8 @@ const filteredData = computed(() => {
     // })
 })
 
-const handlePreBook = (classItem) => {
-    console.log('预约课程:', classItem)
+const handlePreBook = (item) => {
+    console.log('预约课程:', item)
     // 这里添加预约逻辑
 }
 
@@ -197,13 +197,11 @@ watch(scheduleType, () => {
 
                 .day {
                     margin-bottom: 12rpx;
-                    font-size: var(--size-32);
                     font-weight: bold;
                     color: var(--auxiliary-color-1);
                 }
 
                 .week {
-                    font-size: var(--size-24);
                     color: var(--auxiliary-color-4);
                 }
 

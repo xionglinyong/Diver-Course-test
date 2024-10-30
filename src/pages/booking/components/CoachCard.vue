@@ -1,26 +1,26 @@
 <template>
     <view class="coach-card flex box-border">
         <view class="coach-avatar">
-            <image class="avatar-image box-border" :src="coachInfo.avatar" mode="aspectFill" />
+            <image class="avatar-image box-border" :src="data.avatar" mode="aspectFill" />
         </view>
 
         <view class="coach-info flex flex-col flex-auto">
-            <view class="class-details flex flex-col">
-                <text class="coach-name" @click="">
-                    {{ coachInfo.name }}
+            <view class="coach-details flex flex-col">
+                <text class="coach-name fs-16" @click="handleJumpDetail">
+                    {{ data.name }}
                 </text>
 
-                <text class="coach-title box-border">{{ titles }}</text>
+                <text class="coach-title fs-12 box-border">{{ titles }}</text>
 
                 <view class="coach-labels flex">
-                    <text class="coach-label classes box-border" v-for="item in classes" :key="item">
+                    <text class="coach-label classes fs-12 box-border" v-for="item in classes" :key="item">
                         {{ item }}
                     </text>
                 </view>
             </view>
         </view>
 
-        <view class="class-foot flex-none">
+        <view class="coach-foot flex-none">
             <view class="prebook-btn btn-gradient" @click="handlePreBook">预 约</view>
         </view>
     </view>
@@ -30,7 +30,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    coachInfo: {
+    data: {
         type: Object,
         required: true,
         default: () => ({})
@@ -39,9 +39,19 @@ const props = defineProps({
 
 const emit = defineEmits(['prebook'])
 
-const titles = computed(() => (props.coachInfo.titles || []).join('、'))
+const titles = computed(() => (props.data.titles || []).join('、'))
 
-const classes = computed(() => (props.coachInfo.classes || []).map(item => item.name))
+const classes = computed(() => (props.data.classes || []).map(item => item.name))
+
+const handleJumpDetail = () => {
+    const url = '/pages/coach-detail/coach-detail'
+    uni.navigateTo({
+        url: `${url}?id=${props.data.id}`,
+        success: (res) => {
+            // res.eventChannel.emit('')
+        }
+    })
+}
 
 const handlePreBook = () => {
     emit('prebook')
@@ -73,17 +83,15 @@ const handlePreBook = () => {
 
     .coach-info {
 
-        .class-details {
+        .coach-details {
             gap: var(--size-12);
         }
 
         .coach-name {
-            font-size: var(--size-32);
             font-weight: bold;
         }
 
         .coach-title {
-            font-size: var(--size-24);
             color: var(--auxiliary-color-4);
             white-space: nowrap;
             overflow: hidden;
@@ -97,7 +105,6 @@ const handlePreBook = () => {
         .coach-label {
             padding: 6rpx 10rpx;
             text-align: center;
-            font-size: var(--size-24);
             text-wrap: nowrap;
             background-color: var(--auxiliary-opacity-color-3);
             border-radius: var(--size-8);
