@@ -24,7 +24,7 @@
     </view>
 
     <!-- 金刚位入口 -->
-    <view class="quick-entry">
+    <view class="quick-entry box-border">
         <view class="entry-item" v-for="(item, index) in entryList" :key="index" @click="navigateTo(item.path)">
             <image :src="item.icon" mode="aspectFit"></image>
             <text>{{ item.name }}</text>
@@ -53,9 +53,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { onLoad, onShow } from "@dcloudio/uni-app"
 import { useUserStore } from '@/stores/user'
 import QRCodeModal from '@/components/QRCodeModal.vue'
 import UserCard from '@/components/UserCard.vue'
+import { updateTabActive } from "@/utils/common"
 
 const userStore = useUserStore()
 const userInfo = ref({
@@ -99,6 +101,14 @@ const updateCertificateImage = (newImageUrl) => {
     certificateImageUrl.value = newImageUrl
     // 这里可以添加逻辑来保存更新后的证书图片到用户信息中
 }
+
+onLoad(() => {
+    console.log('页面加载完成')
+})
+
+onShow(() => {
+    updateTabActive()
+})
 
 onMounted(async () => {
     if (userStore.userInfo) {

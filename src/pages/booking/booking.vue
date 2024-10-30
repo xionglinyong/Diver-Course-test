@@ -1,5 +1,5 @@
 <template>
-    <view class="booking box-border" :style="{ height: bookingHeight }">
+    <view class="booking-page box-border" :style="{ height: bookingHeight }">
         <view class="calendar-box">
             <scroll-view scroll-x show-scrollbar="false" class="weekday-list">
                 <view class="weekdays flex">
@@ -14,31 +14,33 @@
 
         <view class="daily-schedule flex flex-col box-border">
             <view class="schedule-header">
-                <view class="schedule-filter">全部课程</view>
-                <view class="schedule-filter">全部教练</view>
-                <view class="schedule-filter">全部时段</view>
+                <view class="schedule-filter" @click="handleSwitchSchedule(scheduleTypeEnum.classes)">全部课程</view>
+                <view class="schedule-filter" @click="handleSwitchSchedule(scheduleTypeEnum.coaches)">全部教练</view>
+                <!-- <view class="schedule-filter" @click="handleSwitchSchedule">全部时段</view> -->
             </view>
 
-            <scroll-view scroll-y class="class-list box-border" v-if="filteredClasses.length > 0" show-scrollbar="false">
-                <ClassItem class="mt-20" v-for="(classItem, index) in filteredClasses" :key="index" :class-info="classItem"
-                    @book="bookClass(classItem)" />
+            <scroll-view scroll-y class="class-list box-border" v-if="filteredData.length > 0" show-scrollbar="false">
+                <ClassCard class="mt-20" v-for="(dataItem, index) in filteredData"
+                    v-if="scheduleType === scheduleTypeEnum.classes" :key="index" :class-info="dataItem"
+                    @prebook="handlePreBook(dataItem)" />
+
+                <CoachCard class="mt-20" v-for="(dataItem, index) in filteredData"
+                    v-if="scheduleType === scheduleTypeEnum.coaches" :key="index" :coach-info="dataItem"
+                    @prebook="handlePreBook(dataItem)" />
             </scroll-view>
-            <Empty v-else text="当前筛选条件下暂无课程" />
+            <Empty v-else text="今日暂无课程安排" />
         </view>
     </view>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { ref, computed, watch } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import Empty from '@/components/Empty.vue'
-import ClassItem from './components/ClassItem.vue'
-
-const bookingHeight = ref('auto')
-onLoad(() => {
-    const sys = uni.getSystemInfoSync()
-    bookingHeight.value = `${sys.windowHeight}px`
-})
+import CoachCard from './components/CoachCard.vue'
+import ClassCard from './components/ClassCard.vue'
+import { getPageHeight, updateTabActive } from "@/utils/common"
+import mock from "./mock.js";
 
 const selectedDate = ref(new Date())
 const weekDayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -85,86 +87,80 @@ const selectDay = (day) => {
 }
 
 // 模拟当天课程数据
-const todayClasses = ref([
-    {
-        time: '09:00-10:00',
-        name: '瑜伽初级',
-        coach: '张教练',
-        coachAvatar: '/static/coach-avatar1.png'
-    },
-    {
-        time: '14:00-15:30',
-        name: '普拉提中级',
-        coach: '李教练',
-        coachAvatar: '/static/coach-avatar2.png'
-    },
-    {
-        time: '19:00-20:00',
-        name: '瑜伽进阶',
-        coach: '王教练',
-        coachAvatar: '/static/coach-avatar3.png'
-    },
-    // 添加更多课程以测试滚动效果
-    {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    },
-    {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    }, {
-        time: '20:30-21:30',
-        name: '冥想课程',
-        coach: '赵教练',
-        coachAvatar: '/static/coach-avatar4.png'
-    },
-])
+const todayClasses = ref([])
 
-// 修改 filteredClasses 计算属性
-const filteredClasses = computed(() => {
+// 修改 filteredData 计算属性
+const filteredData = computed(() => {
     return todayClasses.value
     // .filter(classItem => {
 
     // })
 })
 
-const bookClass = (classItem) => {
+const handlePreBook = (classItem) => {
     console.log('预约课程:', classItem)
     // 这里添加预约逻辑
 }
+
+const scheduleTypeEnum = {
+    classes: 'classes',
+    coaches: 'coaches'
+}
+const scheduleType = ref(scheduleTypeEnum.classes)
+const handleSwitchSchedule = (val) => {
+    scheduleType.value = val
+}
+
+const bookingHeight = ref('auto')
+onLoad(() => {
+    const h = getPageHeight()
+    bookingHeight.value = `${h}px`
+
+    // 初始加载数据
+    fetchDailySchedule()
+})
+
+onShow(() => {
+    updateTabActive()
+})
+
+// 获取当天课程数据
+const fetchDailySchedule = async () => {
+    try {
+        const timestamp = selectedDate.value.getTime()
+        const params = {
+            date: timestamp,
+            type: scheduleType.value
+        }
+
+        // 模拟API请求，实际开发时替换为真实的API调用
+        // const res = await request('/api/schedule/daily', params)
+        // todayClasses.value = res.data
+
+        // 使用mock数据模拟不同type的返回结果
+        if (scheduleType.value === scheduleTypeEnum.classes) {
+            todayClasses.value = mock.classes
+        } else {
+            todayClasses.value = mock.coaches
+        }
+    } catch (error) {
+        console.error('获取课程数据失败:', error)
+    }
+}
+
+// 监听日期变化
+watch(selectedDate, () => {
+    fetchDailySchedule()
+})
+
+// 监听课程类型变化
+watch(scheduleType, () => {
+    fetchDailySchedule()
+})
 </script>
 
 <style lang="scss" scoped>
-.booking {
+.booking-page {
     display: flex;
     flex-direction: column;
     gap: var(--size-20);
@@ -241,7 +237,7 @@ const bookClass = (classItem) => {
 
     .schedule-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         padding: var(--size-24) var(--size-32);
         border-top: 1rpx solid var(--auxiliary-color-4);
         font-size: var(--font-size-32);

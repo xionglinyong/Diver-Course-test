@@ -1,16 +1,18 @@
 <template>
-    <view class="class-item flex box-border">
-        <view class="class-img-box flex-none">
-            <image class="class-img" src="/static/class-bg.png" mode="aspectFill"></image>
+    <view class="class-card flex box-border">
+        <view class="class-image-box flex-none">
+            <image class="class-image" src="/static/class-bg.png" mode="aspectFill"></image>
             <view class="class-time">{{ classInfo.time }}</view>
         </view>
 
         <view class="class-info flex flex-col flex-auto">
             <view class="class-details flex flex-col">
-                <text class="class-name">{{ classInfo.name }}</text>
+                <text class="class-name" @click="">
+                    {{ classInfo.name }} · {{ classInfo.coach.name }}
+                </text>
                 <view class="class-labels flex">
-                    <text class="class-label">
-                        {{ classInfo.name }}
+                    <text class="class-label box-border" v-for="item in labels" :key="item">
+                        {{ item }}
                     </text>
                 </view>
             </view>
@@ -22,7 +24,7 @@
                     </view>
                     <text>{{ joinCount }} 人已预约</text>
                 </view>
-                <view class="book-btn btn-gradient" @click="$emit('book')">预 约</view>
+                <view class="prebook-btn btn-gradient" @click="handlePreBook">预 约</view>
             </view>
         </view>
     </view>
@@ -39,18 +41,23 @@ const props = defineProps({
     },
 })
 
-defineEmits(['book'])
+const emit = defineEmits(['prebook'])
+
+const labels = computed(() => (props.classInfo.labels || []).slice(0, 3))
 
 const joinCount = computed(() => {
     return (props.classInfo.joinUsers || []).length
 })
 
-const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3)
-)
+const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3))
+
+const handlePreBook = () => {
+    emit('prebook')
+}
 </script>
 
 <style lang="scss" scoped>
-.class-item {
+.class-card {
     justify-content: space-between;
     align-items: center;
     gap: var(--size-20);
@@ -61,12 +68,12 @@ const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3)
 }
 
 
-.class-img-box {
+.class-image-box {
     position: relative;
     border-radius: var(--size-8);
     overflow: hidden;
 
-    .class-img {
+    .class-image {
         display: block;
         width: 30vw;
         height: auto;
@@ -89,7 +96,7 @@ const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3)
     min-height: inherit;
 
     .class-details {
-        gap: var(--size-10);
+        gap: var(--size-12);
 
         .class-name {
             font-size: var(--size-32);
@@ -101,10 +108,10 @@ const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3)
         }
 
         .class-label {
-            padding: 6rpx;
+            padding: 6rpx 10rpx;
             text-align: center;
             font-size: var(--size-24);
-            background-color: var(--auxiliary-color-5);
+            background-color: var(--auxiliary-opacity-color-3);
             border-radius: var(--size-8);
         }
     }
@@ -129,7 +136,7 @@ const userAvatats = computed(() => (props.classInfo.joinUsers || []).slice(0, 3)
         }
     }
 
-    .book-btn {
+    .prebook-btn {
         padding: 16rpx 32rpx;
         background-color: #007AFF;
         border-radius: var(--size-12);

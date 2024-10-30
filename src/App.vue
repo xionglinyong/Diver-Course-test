@@ -1,5 +1,6 @@
-<script>
+<script >
 export default {
+    globalData: { tabActive: 0 },
     onLaunch: function () {
         console.log('App Launch')
     },
@@ -9,6 +10,19 @@ export default {
     onHide: function () {
         console.log('App Hide')
     },
+    methods: {
+        setGlobalData(key = '', val) {
+            if (!key || !key.trim() || typeof key !== 'string') return
+            this.globalData[key] = val
+        },
+        getGlobalData(key) {
+            if (!key || !key.trim() || typeof key !== 'string') return
+            if (typeof this.globalData[key] !== 'object') {
+                return this.globalData[key]
+            }
+            return { ...this.globalData[key] }
+        }
+    }
 }
 </script>
 
@@ -25,12 +39,15 @@ export default {
 page {
     // 主题色
     --primary-color: #23ee7d;
+    --primary-opacity-color: rgba(35, 238, 126, 0.1);
     --primary-bg-color: #2e2f34;
     --auxiliary-color-1: #eef7f2; // 月白
     --auxiliary-color-2: #cdd1d3; // 银鱼白
     --auxiliary-color-3: #a8aab3;
     --auxiliary-color-4: #81838c;
     --auxiliary-color-5: #3b3c45;
+    --auxiliary-opacity-color-3: rgba(168, 170, 179, 0.15);
+    --auxiliary-opacity-color-4: rgba(129, 131, 140, 0.15);
     --auxiliary-opacity-color-5: rgba(59, 60, 69, 0.25);
 
     // 行为色
@@ -123,5 +140,10 @@ page {
 
 .mt-20 {
     margin-top: 20rpx;
+}
+
+/* 为自定义导航栏预留底部空间 */
+page {
+    padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
 }
 </style>

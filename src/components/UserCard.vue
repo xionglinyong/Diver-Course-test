@@ -9,8 +9,8 @@
         <scroll-view scroll-y class="styles-scroll-view">
             <view v-if="certificateList.length > 0" class="styles-grid">
                 <view v-for="style in certificateList" :key="style.id" class="style-item" @click="selectStyle(style)">
-                    <image :src="style.imageUrl" mode="aspectFill"></image>
-                    <text>{{ style.name }}</text>
+                    <image class="card-image" :src="style.imageUrl" mode="aspectFill"></image>
+                    <text class="card-name">{{ style.name }}</text>
                 </view>
             </view>
             <Empty v-else text="暂无可用的证书" buttonText="刷新" @buttonClick="showMyCertificates" />
@@ -110,15 +110,16 @@ const selectStyle = (newStyle) => {
     align-items: center;
     cursor: pointer;
 
-    image {
+    .card-image {
         width: 100%;
+        height: unset;
         aspect-ratio: 1.685 / 1;
         margin-bottom: 10rpx;
         border-radius: var(--size-16);
         object-fit: cover;
     }
 
-    text {
+    .card-name {
         font-size: 28rpx;
         text-align: center;
     }
