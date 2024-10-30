@@ -35,6 +35,12 @@
 			"style": {
 				"navigationBarTitleText": "教练详情"
 			}
+		},
+		{
+			"path": "pages/orders/all",
+			"style": {
+				"navigationBarTitleText": "所有订单"
+			}
 		}
 	],
 	"tabBar": {
