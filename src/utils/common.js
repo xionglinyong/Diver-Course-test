@@ -23,8 +23,10 @@ export const rpxToPx = (rpx) => {
  */
 export const getPageHeight = () => {
   const sys = getWindowInfo();
+
   const tabBarHeight = (sys.screenWidth * Number.parseInt(110)) / 750;
-  return sys.windowHeight - tabBarHeight;
+
+  return wx.getWindowInfo ? sys.windowHeight : sys.windowHeight - tabBarHeight;
 };
 
 /**

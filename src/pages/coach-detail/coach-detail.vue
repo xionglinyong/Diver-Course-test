@@ -63,6 +63,7 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getEventChannel } from "@/utils/common"
+import { coachList } from '@/mock'
 
 const coachInfo = ref({})
 

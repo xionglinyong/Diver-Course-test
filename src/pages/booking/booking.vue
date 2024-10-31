@@ -40,7 +40,6 @@ import Empty from '@/components/Empty.vue'
 import CoachCard from './components/CoachCard.vue'
 import CourseCard from './components/CourseCard.vue'
 import { getPageHeight, updateTabActive } from "@/utils/common"
-import mock from "./mock.js";
 
 const selectedDate = ref(new Date())
 const weekDayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -139,9 +138,9 @@ const fetchDailySchedule = async () => {
 
         // 使用mock数据模拟不同type的返回结果
         if (scheduleType.value === scheduleTypeEnum.classes) {
-            todayClasses.value = mock.classes
+            todayClasses.value = []
         } else {
-            todayClasses.value = mock.coaches
+            todayClasses.value = []
         }
     } catch (error) {
         console.error('获取课程数据失败:', error)

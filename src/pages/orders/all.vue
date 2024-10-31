@@ -1,17 +1,9 @@
 <template>
   <view class="header">
-    <input
-      v-model="searchQuery"
-      class="search-input"
-      placeholder="搜索订单..."
-    />
+    <input v-model="searchQuery" class="search-input" placeholder="搜索订单..." />
     <view class="tab-container">
-      <view
-        v-for="tab in TABS"
-        :key="tab.status"
-        :class="['tab', { active: currentTab === tab.status }]"
-        @click="currentTab = tab.status"
-      >
+      <view v-for="tab in orderTabs" :key="tab.type" :class="['tab', { active: currentTab === tab.type }]"
+        @click="currentTab = tab.type">
         {{ tab.label }}
       </view>
     </view>
@@ -34,11 +26,26 @@
 import { computed, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import Empty from "@/components/Empty.vue";
-import { STATUS, TABS, fetchOrders } from "./mock.js";
+
+const ORDER_TABS_TYPE = {
+  All: 0,
+  PendingPayment: 1,
+  PendingShipment: 2,
+  PendingReceipt: 3,
+  Completed: 4,
+}
+
+const orderTabs = [
+  { label: "所有订单", type: ORDER_TABS_TYPE.All },
+  { label: "待付款", type: ORDER_TABS_TYPE.PendingPayment },
+  { label: "待发货", type: ORDER_TABS_TYPE.PendingShipment },
+  { label: "待收货", type: ORDER_TABS_TYPE.PendingReceipt },
+  { label: "已完成", type: ORDER_TABS_TYPE.Completed },
+]
 
 // 状态管理
 const searchQuery = ref("");
-const currentTab = ref(STATUS.All);
+const currentTab = ref(ORDER_TABS_TYPE.All);
 const orders = ref([]);
 
 // 获取订单数据
